@@ -20,6 +20,9 @@ OARepoUIQuasar.boot({
         default: {
             listing: {
                 'creator': Creator
+            },
+            detail: {
+                'creator': Creator
             }
         }
     }

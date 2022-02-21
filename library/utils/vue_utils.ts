@@ -3,7 +3,6 @@ import {RouteLocationMatched, RouteLocationNormalizedLoaded, RouteMeta} from "vu
 
 
 export function isVueComponent(comp: any) {
-    // console.log(!!(comp && typeof comp.render === 'function'), comp)
     return comp && typeof comp.render === 'function'
 }
 

@@ -6,6 +6,7 @@ import {initializeRepository} from "./api/repository";
 import {defaultOptions} from "./default_config";
 import {createAppRouter} from "./router";
 import {RepositoryAppOptions} from "./types/configuration";
+import {RecursivePartial} from "./utils/typescript";
 import {vueMerge} from "./utils/vue_utils";
 
 import RepositoryComponent from './components/RepositoryComponent.vue'
@@ -36,7 +37,7 @@ const OARepoUIQuasar = {
             router: router
         })
     },
-    boot(options?: Partial<RepositoryAppOptions>) {
+    boot(options?: RecursivePartial<RepositoryAppOptions>) {
         if (options === undefined) {
             options = defaultOptions
         } else {

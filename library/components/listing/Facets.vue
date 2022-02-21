@@ -1,29 +1,17 @@
 <template>
   <q-list dense>
-    <q-expansion-item v-for="facet in facets_as_list" :label="facet.label" :key="facet.name">
-      <div v-for="bucket in facet.buckets" class="q-ml-lg q-mr-md" :class="{'bucket-selected': bucket.is_selected}">
-        <router-link :to="addToQuery(facet, bucket)" class="bucket-link">
-          <span class="bucket-label">{{ bucket.label }}</span> <span class="bucket-count">({{
-            bucket.doc_count
-          }})</span>
-        </router-link>
-      </div>
-    </q-expansion-item>
+    <repository-component cid="facets.facet" :facet="facet" v-for="facet in facets_as_list" :key="facet.name"/>
   </q-list>
 </template>
 <script lang="ts" setup>
 import {computed, defineProps} from "vue";
-import {useRoute} from "vue-router";
-import {Aggregations} from "../../types/invenio";
-import {updateQuery} from "../../utils/vue_utils";
-
-const route = useRoute()
+import {Aggregations, AggregationWithName} from "../../types/invenio";
 
 const props = defineProps<{
   facets: Aggregations
 }>()
 
-const facets_as_list = computed(() => {
+const facets_as_list = computed<AggregationWithName[]>(() => {
   return Object.entries(props.facets || {}).map(([name, facet]) => {
     return {
       name: name,
@@ -32,14 +20,4 @@ const facets_as_list = computed(() => {
     }
   })
 })
-
-function addToQuery(facet, bucket) {
-  return updateQuery(
-      route,
-      [
-        {paramName: facet.name, paramValue: bucket.key},
-      ],
-      ['page'],
-      true)
-}
 </script>

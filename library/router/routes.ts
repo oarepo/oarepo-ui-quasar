@@ -6,6 +6,13 @@ export function createRoutes(options: RepositoryAppOptions): RouteRecordRaw[] {
     // TODO: make this dependent on ui context
     const mainLayoutChildren: RouteRecordRaw[] = [
         {
+            name: 'detail',
+            path: ':datamodel/:recordId',
+            component: options.pages.default.detail as Component,
+            props: true
+        },
+        {
+            name: 'listing',
             path: ':datamodel',
             component: options.pages.default.list as Component,
             props: true
@@ -20,14 +27,14 @@ export function createRoutes(options: RepositoryAppOptions): RouteRecordRaw[] {
         ...(options.extraRoutes || []),
         {
             path: '/',
-            component: () => options.layouts.default.homepageLayout,    // TODO: other layouts
+            component: options.layouts.default.homepageLayout,    // TODO: other layouts
             children: mainLayoutChildren,
         }
     ];
 
     ret.push({
         path: '/:catchAll(.*)*',
-        component: () => options.pages?.default?.error || import('../pages/Error404.vue'),
+        component: options.pages?.default?.error || (() => import('../pages/Error404.vue'))
     })
     return ret
 }

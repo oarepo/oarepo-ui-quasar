@@ -10,6 +10,10 @@ export interface Aggregation {
     buckets: Bucket[]
 }
 
+export interface AggregationWithName extends Aggregation {
+    name: string
+}
+
 export interface Aggregations {
     [key: string]: Aggregation
 }

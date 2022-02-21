@@ -1,32 +1,37 @@
 <template>
-  <div>
+  <div class="row">
     <template v-for="(val, idx) in valuesAndComponents">
-      <span v-if="idx>0">, </span>
+      <span v-if="idx>0">,&nbsp; </span>
       <component :is="val.component" :modelValue="val.modelValue"
                  v-bind="val.props"
+                 :components="components"
                  :context="{values: modelValue, index: idx}"></component>
     </template>
   </div>
 </template>
 <script lang="ts" setup>
+import {RepositoryFormComponents} from "@oarepo/oarepo-ui-quasar";
 import {computed, defineProps} from "vue";
-import {SchemaField} from "blitzar";
+import {StringOrLayoutComponent, UILayout, UILayoutComponent} from "../../types/ui_context";
+import {resolveComponent} from "../../utils/form_utils";
 
 const props = defineProps<{
   modelValue: Array<any> | { [k: string]: any },
-  itemComponent?: any,
-  itemProperties?: any,
-  schema?: Array<SchemaField>,
+  item?: StringOrLayoutComponent,
+  schema?: UILayout,
+  components: RepositoryFormComponents
   flat?: boolean
 }>()
 
-function fromSchema(modelValue: { [p: string]: any }, schema: Array<SchemaField>, flat?: boolean) {
+function fromSchema(modelValue: { [p: string]: any }, schema: UILayout, flat?: boolean) {
   const ret = []
   schema.forEach(x => {
     let value = x.id ? modelValue[x.id] : modelValue
     if (value === undefined) {
       return
     }
+    x = resolveComponent(x, props.components)
+    console.log(x)
     if (Array.isArray(value) && flat) {
       value.forEach(val => {
         ret.push({
@@ -37,8 +42,8 @@ function fromSchema(modelValue: { [p: string]: any }, schema: Array<SchemaField>
       })
     } else {
       ret.push({
-        'component': x.component,
-        'modelValue': value,
+        component: x.component,
+        modelValue: value,
         props: x
       })
     }
@@ -46,29 +51,29 @@ function fromSchema(modelValue: { [p: string]: any }, schema: Array<SchemaField>
   return ret
 }
 
-function fromArray(modelValue: Array<any>, itemComponent: any, itemProps: any, flat?: boolean) {
+function fromArray(modelValue: Array<any>, item?: StringOrLayoutComponent, flat?: boolean) {
   const ret = []
   if (!modelValue) {
     return []
   }
-  modelValue.forEach(x => {
-    let value = x
+  const resolvedItem: UILayoutComponent = resolveComponent(item, props.components)
+  modelValue.forEach(value => {
     if (value === undefined) {
       return
     }
     if (Array.isArray(value) && flat) {
       value.forEach(val => {
         ret.push({
-          'component': itemComponent,
+          'component': resolvedItem.component,
           'modelValue': val,
-          'props': itemProps
+          'props': resolvedItem
         })
       })
     } else {
       ret.push({
-        'component': itemComponent,
+        'component': resolvedItem.component,
         'modelValue': value,
-        'props': itemProps
+        'props': resolvedItem
       })
     }
   })
@@ -82,6 +87,6 @@ const valuesAndComponents = computed(() => {
   if (props.schema) {
     return fromSchema(props.modelValue, props.schema, props.flat)
   }
-  return fromArray(props.modelValue as any[], props.itemComponent, props.itemProperties, props.flat)
+  return fromArray(props.modelValue as any[], props.item, props.flat)
 })
 </script>

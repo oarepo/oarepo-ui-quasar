@@ -29,8 +29,11 @@ export interface Components {
         // menu components here
     },
     listing: RepositoryFormComponents,
+    detail: RepositoryFormComponents,
     facets: {
         container: Component | Lazy<Component>
+        facet: Component | Lazy<Component>
+        buckets: Component | Lazy<Component>
     }
 }
 

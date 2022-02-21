@@ -13,7 +13,6 @@ const currentComponents = computed<Components>(() => {
     }
     const contextComponents = repositoryAppOptions.value.components[contextId.value] || {}
     const defaultComponents: Components = repositoryAppOptions.value.components['default'] || {}
-    console.log(defaultComponents)
     return {
         pageTitle: contextComponents.pageTitle || defaultComponents.pageTitle,
         menu: {
@@ -23,8 +22,14 @@ const currentComponents = computed<Components>(() => {
             ...(defaultComponents.listing || {} as RepositoryFormComponents),
             ...(contextComponents.listing || {} as RepositoryFormComponents),
         },
+        detail: {
+            ...(defaultComponents.detail || {} as RepositoryFormComponents),
+            ...(contextComponents.detail || {} as RepositoryFormComponents),
+        },
         facets: {
-            container: contextComponents.facets?.container || defaultComponents.facets.container
+            container: contextComponents.facets?.container || defaultComponents.facets.container,
+            facet: contextComponents.facets?.facet || defaultComponents.facets.facet,
+            buckets: contextComponents.facets?.buckets || defaultComponents.facets.buckets
         }
     } as Components
 })

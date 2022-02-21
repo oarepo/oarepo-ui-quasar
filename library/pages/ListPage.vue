@@ -2,7 +2,7 @@
   <q-page padding>
     <div class="records-list" v-if="records.length" :class="{loading: loading}">
       <q-list separator>
-        <q-item v-for="record in records" :key="record.id">
+        <q-item v-for="record in records" :key="record.id" :to="{name: 'detail', params: {recordId: record.id}}">
           <q-item-section>
             <BlitzForm :modelValue="record.metadata" :schema="uiSchema" v-if="uiSchema"/>
           </q-item-section>
@@ -15,28 +15,22 @@
       Nothing found ...
     </div>
     <teleport to="#sidebar" v-if="sidebarVisible">
-      <repository-component id="facets.container" :facets="facets"/>
+      <repository-component cid="facets.container" :facets="facets"/>
     </teleport>
   </q-page>
 </template>
 <script lang="ts" setup>
-import {useRoute, useRouter} from "vue-router";
-import RepositoryComponent from "../components/RepositoryComponent.vue";
-import {useSidebar} from "../services/sidebar";
-import {useListing} from "../api/listing";
-import {useUI} from "../services/ui";
-import {ListingOptions} from "../types/invenio";
-import {updateQuery} from "../utils/vue_utils";
-import {runAndWatch} from "../utils/watch";
-import {useUIContext} from "../api/ui_context";
+import {BlitzForm} from 'blitzar'
 
 import {computed, defineProps} from "vue";
-import {BlitzForm} from 'blitzar'
-import {layout2blitzar} from "../utils/form_utils";
-
-import {scroll} from 'quasar'
-
-const {getScrollTarget, setVerticalScrollPosition} = scroll
+import {useRoute, useRouter} from "vue-router";
+import {useListing} from "../api/listing";
+import RepositoryComponent from "../components/RepositoryComponent.vue";
+import {useSidebar} from "../services/sidebar";
+import {ListingOptions} from "../types/invenio";
+import {loadUIBlitzarSchema} from "../utils/form_utils";
+import {updateQuery} from "../utils/vue_utils";
+import {runAndWatch} from "../utils/watch";
 
 
 const props = defineProps({
@@ -46,11 +40,8 @@ const props = defineProps({
 const route = useRoute()
 const router = useRouter()
 
-const {current: uiContext} = useUIContext()
-
 const {sidebarVisible} = useSidebar()
 const {load, records, pages, facets, loading} = useListing()
-const {currentComponents} = useUI()
 
 runAndWatch([() => props.datamodel, () => route.query], async () => {
   await load(props.datamodel!, route.query as ListingOptions)
@@ -65,14 +56,7 @@ const currentPage = computed(() => {
   return parseInt(route.query.page as string || '1')
 })
 
-
-const uiSchema = computed(() => {
-  let currentUiContext = uiContext.value;
-  if (!currentUiContext || !currentComponents.value.listing) {
-    return undefined
-  }
-  return layout2blitzar(currentUiContext[props.datamodel].listing.layout, currentComponents.value.listing)
-})
+const uiSchema = loadUIBlitzarSchema(props.datamodel!, 'listing')
 
 function pageChanged(pageNo: number) {
   router.push(updateQuery(route, [{paramName: 'page', paramValue: pageNo.toString()}], []))
