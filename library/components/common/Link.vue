@@ -16,10 +16,16 @@ const props = withDefaults(defineProps<{
 })
 
 const linkDestination = computed(() => {
+  if (typeof props.modelValue === 'string') {
+    return props.modelValue
+  }
   return props.modelValue ? props.modelValue[props.url] : undefined
 })
 
 const linkText = computed(() => {
+  if (typeof props.modelValue === 'string') {
+    return props.modelValue
+  }
   return props.modelValue ? (props.modelValue[props.text] || props.modelValue[props.url]) : undefined
 })
 
