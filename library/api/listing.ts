@@ -9,6 +9,7 @@ const currentHttp = new Http<SearchResult<any>>({keepData: true})
 const modelId = ref<string>()
 
 const defaultOptions = ref<ListingOptions>({
+    'oarepo:context': 'default',    // TODO: handle context
     page: '1',
     size: '10',     // TODO: add the default page size to configuration (or ui context or user prefs)
     facets: []      // TODO: take the default facets from the ui context
